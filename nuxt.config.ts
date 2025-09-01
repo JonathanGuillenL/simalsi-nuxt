@@ -7,6 +7,20 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     'vuetify-nuxt-module'
   ],
+  runtimeConfig: {
+    apiBase: '',
+    oauth: {
+      keycloak: {
+        serverUrl: '',
+        clientId: '',
+        clientSecret: '',
+        realm: ''
+      }
+    },
+    public: {
+      appBase: ''
+    }
+  },
   vuetify: {
     vuetifyOptions: {
       icons: {
