@@ -1,14 +1,17 @@
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
+  const runtimeConfig = useRuntimeConfig()
 
   // limpiar sesión del cliente
   await clearUserSession(event)
 
-  const clientId = 'quarkus-app'
-  const redirectUri = encodeURIComponent('http://localhost:3000/')
-  const idToken = session?.id_token
+  const serverUrl = runtimeConfig.oauth.keycloak.serverUrl
+  const clientId = runtimeConfig.oauth.keycloak.clientId
+  const realm = runtimeConfig.oauth.keycloak.realm
+  const redirectUri = encodeURIComponent(runtimeConfig.public.appBase)
+  // const idToken = session.secure?.token.id_token
 
-  const keycloakLogoutUrl = `http://localhost:8180/realms/SIMALSI/protocol/openid-connect/logout?client_id=${clientId}&post_logout_redirect_uri=${redirectUri}&id_token_hint=${idToken}`
+  const keycloakLogoutUrl = `${serverUrl}/realms/${realm}/protocol/openid-connect/logout?client_id=${clientId}&post_logout_redirect_uri=${redirectUri}`
 
   return sendRedirect(event, keycloakLogoutUrl)
 })

@@ -1,6 +1,19 @@
 export default defineOAuthKeycloakEventHandler({
   async onSuccess(event, { user, tokens }) {
-    await setUserSession(event, { user, id_token: tokens?.id_token, access_token: tokens?.access_token })
+    const now = new Date()
+    const time = now.getTime() + tokens.expires_in * 1000
+
+    await setUserSession(event, {
+      user,
+      secure: {
+        token: {
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          expires_in: time
+        }
+      }
+    })
+
     return sendRedirect(event, '/')
   },
   async onError(event, error) {
