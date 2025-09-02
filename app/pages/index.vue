@@ -1,5 +1,5 @@
 <script setup>
-const { loggedIn, user, session, fetch, clear, openInPopup } = useUserSession()
+const { loggedIn, user, session, openInPopup } = useUserSession()
 </script>
 
 <template>
