@@ -14,6 +14,11 @@ const criterioLabel = computed(() => {
   return label?.title
 })
 
+const estados: CriteriaItem[] = [
+  { title: 'Activo', value: 'ACTIVO' },
+  { title: 'Inactivo', value: 'INACTIVO' }
+]
+
 function clearCriteriaHandler() {
   criteria.value = null
   emit('clear')
@@ -33,14 +38,25 @@ function clearCriteriaHandler() {
       @click:clear="clearCriteriaHandler"
       @update:model-value="criteriaData = null"
     />
-    <VTextField
-      v-if="criteria"
-      v-model="criteriaData"
-      :label="criterioLabel"
-      class="w-52"
-      variant="outlined"
-      density="compact"
-    />
+    <div v-if="criteria">
+      <VSelect
+        v-if="criteria === 'estado'"
+        v-model="criteriaData"
+        :label="criterioLabel"
+        :items="estados"
+        class="w-52"
+        variant="outlined"
+        density="compact"
+      />
+      <VTextField
+        v-else
+        v-model="criteriaData"
+        :label="criterioLabel"
+        class="w-52"
+        variant="outlined"
+        density="compact"
+      />
+    </div>
     <button
       class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-6"
       @click="$emit('search')"

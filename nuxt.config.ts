@@ -23,6 +23,17 @@ export default defineNuxtConfig({
   },
   vuetify: {
     vuetifyOptions: {
+      theme: {
+        defaultTheme: 'light',
+        themes: {
+          light: {
+            dark: false,
+            colors: {
+              error: '#dc2626',
+            },
+          },
+        }
+      },
       icons: {
         defaultSet: 'fa'
       }

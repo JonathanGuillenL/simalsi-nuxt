@@ -4,3 +4,10 @@ declare interface Page<T> {
   size: number
   totalPages: number
 }
+
+declare interface MenuItem {
+  name: string
+  label: string
+  icon: string
+  group: string
+}

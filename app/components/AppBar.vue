@@ -1,13 +1,20 @@
 <script setup lang="ts">
+import useWindowSize from '~/composables/useWindowSize';
+
 defineProps({
   open: {
     type: Boolean,
     required: true,
   },
 })
+
+defineEmits(['toggle'])
+
+const { match } = useWindowSize(640)
 </script>
 
 <template>
+  <div v-if="!match && open" class="fixed inset-0 bg-black/60 z-20" @click="$emit('toggle')"></div>
   <aside
     :class="{ '-translate-x-64': !open }"
     class="fixed top-0 bottom-0 z-20 bg-zinc-50 w-64 shadow-2xl border-r px-4 pb-20 duration-300 overflow-y-auto"
@@ -27,6 +34,8 @@ defineProps({
             <span>Home</span>
           </NuxtLink>
         </li>
+
+        <div class="text-sm text-black mt-5">Solicitud</div>
         <li>
           <NuxtLink
             to="/paciente"

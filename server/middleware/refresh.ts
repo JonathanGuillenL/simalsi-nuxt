@@ -17,32 +17,46 @@ export default defineEventHandler(async (event) => {
     timeZone: 'America/Managua'
   }))
 
-  if (expirationDate < now) {
-    const response: RefreshTokenResponse = await $fetch(`${serverUrl}/realms/${realm}/protocol/openid-connect/token`, {
-      method: 'POST',
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        client_id: clientId,
-        client_secret: clientSecret,
-        refresh_token: secure?.token.refresh_token || ''
-      }),
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    })
-
-    const time = (new Date()).getTime() + (response.expires_in ?? 0) * 1000
-
-    const session = await setUserSession(event, {
-      secure: {
-        token: {
-          access_token: response.access_token,
-          refresh_token: response.refresh_token,
-          expires_in: time
+  if (expirationDate <= now) {
+    try {
+      const responseDate = new Date()
+      const response: RefreshTokenResponse = await $fetch(`${serverUrl}/realms/${realm}/protocol/openid-connect/token`, {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          client_id: clientId,
+          client_secret: clientSecret,
+          refresh_token: secure?.token.refresh_token || ''
+        }),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
         }
-      }
-    })
+      })
 
-    console.log(session.secure)
+      const time = responseDate.getTime() + (response.expires_in ?? 0) * 1000
+
+      await setUserSession(event, {
+        secure: {
+          token: {
+            access_token: response.access_token,
+            refresh_token: response.refresh_token,
+            expires_in: time
+          }
+        }
+      }, {
+        cookie: {
+          httpOnly: true,
+          maxAge: response.refresh_expires_in, // duración en segundos
+          path: '/',
+          secure: process.env.NODE_ENV === 'production'
+        }
+      })
+
+      console.log(response)
+
+    } catch (error: any) {
+      await clearUserSession(event)
+      throw createError({ statusCode: 401, statusMessage: 'Invalid session' })
+    }
   }
 })

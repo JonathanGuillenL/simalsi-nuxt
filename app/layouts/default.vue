@@ -7,8 +7,8 @@ function toggleSidebar() {
 </script>
 
 <template>
-  <AppHeader :open="open" username="user" @toggle="toggleSidebar" />
-  <AppBar :open="open" />
+  <AppHeader :open="open" @toggle="toggleSidebar" />
+  <AppBar :open="open" @toggle="toggleSidebar" />
   <main :class="{ 'sm:pl-64': open }" class="pt-16">
     <slot />
   </main>

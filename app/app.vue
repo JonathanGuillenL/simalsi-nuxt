@@ -4,7 +4,7 @@ import { NuxtPage } from '#components';
 </script>
 
 <template>
-  <NuxtLoadingIndicator />
+  <NuxtLoadingIndicator :height="3" />
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>

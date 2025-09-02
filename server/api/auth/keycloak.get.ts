@@ -12,6 +12,13 @@ export default defineOAuthKeycloakEventHandler({
           expires_in: time
         }
       }
+    }, {
+      cookie: {
+        httpOnly: true,
+        maxAge: tokens.refresh_expires_in, // duración en segundos
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
     })
 
     return sendRedirect(event, '/')

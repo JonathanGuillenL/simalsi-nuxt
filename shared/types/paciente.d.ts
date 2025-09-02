@@ -7,6 +7,8 @@ declare interface PacientePageResponse {
   edad: number
   nacimiento: string
   telefono: string
+  createdAt: string | null
+  deletedAt: string | null
 }
 
 declare interface PacienteResponse {
@@ -16,6 +18,17 @@ declare interface PacienteResponse {
   edad: number
   nacimiento: string
   sexo: Sexo
+  telefono: string
+  direccion: string
+  createdAt: string | null
+  deletedAt: string | null
+}
+
+declare interface PacienteCreateRequest {
+  nombres: string
+  apellidos: string
+  nacimiento: string | null
+  sexo: string | null
   telefono: string
   direccion: string
 }

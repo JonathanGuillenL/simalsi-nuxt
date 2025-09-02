@@ -1,5 +1,4 @@
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
   const runtimeConfig = useRuntimeConfig()
 
   // limpiar sesión del cliente
