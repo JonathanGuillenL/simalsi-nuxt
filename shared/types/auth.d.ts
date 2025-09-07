@@ -5,9 +5,7 @@ declare module '#auth-utils' {
     preferred_username: string
     given_name: string
     email: string
-    realm_access: {
-      roles: string[]
-    }
+    roles: string[]
   }
 
   interface SecureSessionData {

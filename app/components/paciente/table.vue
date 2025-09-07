@@ -1,19 +1,25 @@
 <script setup lang="ts">
+defineProps({
+  register: {
+    type: Boolean,
+    default: false
+  },
+  selector: {
+    type: Boolean,
+    default: false
+  }
+})
+
+defineEmits(['select'])
+
 const route = useRoute()
 const router = useRouter()
 
-function getCriteria() {
-  const entries = Object.entries(route.query)
-  return entries.find(e => e[0] !== 'page')
-}
-
-const criteria = ref<string | null>(getCriteria()?.[0] ?? null)
-const criteriaValue = ref<string | null>(getCriteria()?.[1]?.toString() ?? null)
 const queryParams = computed(() => {
   const q: Record<string, any> = { ...route.query }
 
   q.page = parseInt(route.query.page?.toString() ?? '1') - 1,
-  q.size = 5
+  q.size = parseInt(route.query.size?.toString() ?? '5')
   return q
 })
 
@@ -30,9 +36,15 @@ const { data } = await useLazyFetch<Page<PacientePageResponse>>('/api/paciente/p
   query: queryParams,
 })
 
-function updateQueryParams(page: number, search: boolean = false) {
-  if (search && criteria.value && criteriaValue.value) {
-    router.push(`?page=${page}&${criteria.value}=${criteriaValue.value}`)
+function updateQueryParams(page: number, search: boolean = false, filter: Record<string, any> | null = null) {
+  console.log(filter)
+  if (filter && filter.criteria && filter.criteriaData) {
+    router.push({ query: {
+      page,
+      [filter.criteria]: filter.criteriaData
+    } })
+  } else if (search) {
+    router.push({ query: { ...queryParams.value, page } })
   } else {
     router.push(`?page=${page}`)
   }
@@ -47,10 +59,8 @@ function updateQueryParams(page: number, search: boolean = false) {
     >Registrar paciente</router-link>
 
     <SearchCriteria
-      v-model:criteria="criteria"
-      v-model:criteria-value="criteriaValue"
       :items="criterioItems"
-      @search="updateQueryParams(1, true)"
+      @search="(filter) => updateQueryParams(1, false, filter)"
       @clear="updateQueryParams(1)"
     />
   </div>
@@ -93,7 +103,13 @@ function updateQueryParams(page: number, search: boolean = false) {
             <span v-if="item.deletedAt" class="text-xs bg-red-500 text-white font-semibold rounded-xl py-1 px-2 mx-2">Inactivo</span>
             <span v-else class="text-xs bg-lime-500 text-white font-semibold rounded-xl py-1 px-2 mx-2">Activo</span>
           </td>
-          <td class="border px-6 py-3">
+          <td v-if="selector" class="border px-2 py-2">
+            <button
+              @click="$emit('select', item)"
+              class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"
+            >Seleccionar</button>
+          </td>
+          <td v-else class="border px-6 py-3">
             <NuxtLink
               :to="'/paciente/' + item.id"
               class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"

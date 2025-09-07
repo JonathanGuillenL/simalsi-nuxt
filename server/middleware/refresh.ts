@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     timeZone: 'America/Managua'
   }))
 
-  if (expirationDate <= now) {
+  if (!event.path?.startsWith('/api/auth') && expirationDate <= now) {
     try {
       const responseDate = new Date()
       const response: RefreshTokenResponse = await $fetch(`${serverUrl}/realms/${realm}/protocol/openid-connect/token`, {
@@ -56,7 +56,6 @@ export default defineEventHandler(async (event) => {
 
     } catch (error: any) {
       await clearUserSession(event)
-      throw createError({ statusCode: 401, statusMessage: 'Invalid session' })
     }
   }
 })

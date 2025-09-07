@@ -68,7 +68,6 @@ function onClickHandle() {
       }
     })
   } else {
-    console.log('error ', pacienteRequest.value)
     $fetch('/api/paciente/' + id.value, {
       method: 'PUT',
       body: pacienteRequest.value,

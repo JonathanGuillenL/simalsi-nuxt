@@ -56,6 +56,16 @@ const { match } = useWindowSize(640)
             <span>Médico tratante</span>
           </NuxtLink>
         </li>
+        <li>
+          <NuxtLink
+            to="/solicitud"
+            class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
+            active-class="bg-blue-100 !border-stone-200"
+          >
+            <VIcon class="mr-2" icon="fa fa-file-lines" size="x-small" />
+            <span>Solicitud</span>
+          </NuxtLink>
+        </li>
       </ul>
     </nav>
   </aside>
