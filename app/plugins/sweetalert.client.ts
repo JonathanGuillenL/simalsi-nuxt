@@ -19,6 +19,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         icon: 'error',
         title: '¡Error!',
         text: typeof error === 'string' ? error : error.message,
+        customClass: {
+          confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg'
+        },
       })
     }
 

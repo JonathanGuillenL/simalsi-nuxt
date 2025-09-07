@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const { secure } = await requireUserSession(event)
   const id = getRouterParam(event, 'id')
 
-  const data = await $fetch<Page<PacienteResponse>>(`${apiBase}/paciente/${id}`, {
+  const data = await $fetch<MedicoTratanteResponse>(`${apiBase}/medico-tratante/${id}`, {
     headers: {
       Authorization: `Bearer ${secure?.token.access_token}`
     }
