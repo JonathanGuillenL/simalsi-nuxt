@@ -3,7 +3,13 @@ const router = useRouter()
 const sweetAlert = useSweetAlert()
 
 const modalCliente = ref(false)
-const clienteNombre = ref('')
+const clienteNombre = computed(() => {
+  if (cliente.value && cliente.value.persona && cliente.value.persona.apellido) {
+    return cliente.value.persona.nombre + ' ' + cliente.value.persona.apellido
+  }
+  return cliente.value?.persona?.nombre || ''
+})
+const cliente = ref<ClientePageResponse | null>(null)
 
 const modalPaciente = ref(false)
 const paciente = ref<PacientePageResponse | null>(null)
@@ -34,7 +40,7 @@ const fechaTomaPrint = computed(() => {
 })
 
 const solicitud = ref<SolicitudCreateRequest>({
-  clienteId: 100,
+  clienteId: null,
   pacienteId: null,
   medicoTratanteId: null,
   servicioLaboratorioId: 100,
@@ -50,7 +56,15 @@ const errors = ref({
   fechaTomaMuestra: '',
 })
 
-function actualizarClienteSolicitado(pacienteResponse: PacientePageResponse) {
+function actualizarCliente(clienteResponse: ClientePageResponse) {
+  cliente.value = clienteResponse
+
+  if (cliente.value.tipoCliente === 'MEDICO_AFILIADO') {
+    medicoTratante.value = null
+  }
+}
+
+function actualizarPaciente(pacienteResponse: PacientePageResponse) {
   paciente.value = pacienteResponse
 }
 
@@ -105,11 +119,11 @@ function saveHandler() {
             <div class="w-2/3">
               <v-text-field :model-value="clienteNombre" label="Cliente" variant="outlined" density="compact" :error-messages="errors.clienteId" :readonly="true"></v-text-field>
             </div>
-            <button @click="console.log(solicitud)" class="font-semibold text-sm text-white bg-blue-600 rounded-md hover:shadow-lg w-1/3 px-3 py-2"
+            <button @click="modalCliente = true" class="font-semibold text-sm text-white bg-blue-600 rounded-md hover:shadow-lg w-1/3 px-3 py-2"
             >
               Seleccionar cliente
             </button>
-            <!--<BuscarCliente :open="openModalCliente" :model-value="solicitud.clienteId" @update:model-value="actualizarClienteSolicitado" @toggle="toggleModalCliente"></BuscarCliente> -->
+            <ClienteModal :open="modalCliente" v-model="solicitud.clienteId" @selected="actualizarCliente" @toggle="modalCliente = !modalCliente" />
           </div>
         </div>
       </div>
@@ -130,12 +144,12 @@ function saveHandler() {
           >
             Seleccionar paciente
           </button>
-          <PacienteModal :open="modalPaciente" v-model="solicitud.pacienteId" @selected="actualizarClienteSolicitado" @toggle="modalPaciente = !modalPaciente" />
+          <PacienteModal :open="modalPaciente" v-model="solicitud.pacienteId" @selected="actualizarPaciente" @toggle="modalPaciente = !modalPaciente" />
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded border overflow-hidden shadow-lg">
+    <div v-if="cliente?.tipoCliente !== 'MEDICO_AFILIADO'" class="bg-white rounded border overflow-hidden shadow-lg">
       <div class="flex items-center justify-between bg-sky-800 mb-2 px-6 pt-6 pb-3">
         <h1 class="text-2xl text-white font-semibold">Buscar médico tratante</h1>
       </div>
@@ -211,7 +225,7 @@ function saveHandler() {
     <div class="sticky top-20 bg-white rounded border shadow-lg space-y-5 h-fit p-6">
       <h1 class="text-2xl font-semibold">Resumen</h1>
 
-      <!--<div>
+      <div>
           <div class="flex items-center space-x-1 mb-2">
               <h1 class="text-lg font-semibold">Solicitado por:</h1>
               <div v-if="cliente?.tipoCliente == 'CLIENTE_ESPONTANEO'" class="text-xs bg-lime-500 text-white font-semibold rounded-xl py-1 px-2">Cliente espontáneo</div>
@@ -223,7 +237,7 @@ function saveHandler() {
                   <input :value="clienteNombre" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
               </div>
           </div>
-      </div>-->
+      </div>
 
       <div>
           <div class="flex items-center space-x-1 mb-2">

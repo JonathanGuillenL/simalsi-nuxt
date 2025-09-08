@@ -25,12 +25,12 @@ function toggleHandler() {
     <div v-if="open" class="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
       <div class="bg-white border mx-auto max-w-5xl rounded-lg p-6 my-20">
         <div class="flex justify-between items-center border-b mb-5">
-          <div class="font-semibold text-xl">Seleccione un paciente</div>
+          <div class="font-semibold text-xl">Seleccione un cliente</div>
           <button @click="toggleHandler" class="flex justify-center items-center hover:bg-gray-100 rounded p-2 m-1">
             <v-icon icon="fa fa-x" size="x-small"></v-icon>
           </button>
         </div>
-        <PacienteTable :selector="true" @select="handleSeleccionar" />
+        <ClienteTable :selector="true" @select="handleSeleccionar" />
       </div>
     </div>
   </teleport>
