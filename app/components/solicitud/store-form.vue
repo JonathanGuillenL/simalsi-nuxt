@@ -204,7 +204,7 @@ function saveHandler() {
           >
             Seleccionar procedimiento
           </button>
-          <!-- <BuscarServicioLaboratorio :open="modalServicio" v-model="solicitud.servicioLaboratorioId" @selected="actualizarServicio" @toggle="modalServicio = !modalServicio"></BuscarServicioLaboratorio> -->
+          <ServicioModal :open="modalServicio" v-model="solicitud.servicioLaboratorioId" @selected="actualizarServicio" @toggle="modalServicio = !modalServicio" />
         </div>
       </div>
     </div>

@@ -78,6 +78,18 @@ const { match } = useWindowSize(640)
             <span>Cliente</span>
           </NuxtLink>
         </li>
+
+        <div class="text-sm text-black mt-5">Facturación</div>
+        <li>
+          <NuxtLink
+            to="/servicio"
+            class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
+            active-class="bg-blue-100 !border-stone-200"
+          >
+            <VIcon class="mr-2" icon="fa fa-flask" size="x-small" />
+            <span>Servicio laboratorio</span>
+          </NuxtLink>
+        </li>
       </ul>
     </nav>
   </aside>
