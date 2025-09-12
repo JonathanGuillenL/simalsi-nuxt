@@ -153,7 +153,7 @@ function onEnableHandler() {
     <button class="text-blue-500" @click="$router.back()">Administración de servicios</button>
     /
     <span v-if="edit">{{ servicioResponse?.descripcion }}</span>
-    <template v-else>Registrar paciente</template>
+    <template v-else>Registrar servicio</template>
     <span v-if="servicioResponse?.deletedAt != null" class="text-xs bg-red-500 text-white font-semibold rounded-xl py-1 px-2 mx-2">Inactivo</span>
   </div>
 
@@ -184,8 +184,8 @@ function onEnableHandler() {
       <v-text-field v-model="servicioRequest.descripcion" label="Descripción" variant="outlined" :error-messages="errors.descripcion" @update:model-value="errors.descripcion = ''"></v-text-field>
       <money-field v-model="servicioRequest.precio" label="Precio" variant="outlined" :error-messages="errors.precio" @update:model-value="errors.descripcion = ''"></money-field>
 
-      <v-select v-model="servicioRequest.regionAnatomicaId" :items="regionesAnatomicas" label="Región anatómica" prepend-icon="" variant="outlined" clearable :error-messages="errors.regionAnatomicaId" @update:model-value="errors.regionAnatomicaId = ''; servicioRequest.procedimientoId = null"></v-select>
-      <v-select v-model="servicioRequest.procedimientoId" :items="procedimientos" label="Procedimiento quirúrgico" prepend-icon="" variant="outlined" clearable :error-messages="errors.procedimientoId" @update:model-value="errors.procedimientoId = ''"></v-select>
+      <VAutocomplete v-model="servicioRequest.regionAnatomicaId" :items="regionesAnatomicas" label="Región anatómica" prepend-icon="" variant="outlined" clearable :error-messages="errors.regionAnatomicaId" @update:model-value="errors.regionAnatomicaId = ''; servicioRequest.procedimientoId = null"></VAutocomplete>
+      <VAutocomplete v-model="servicioRequest.procedimientoId" :items="procedimientos" label="Procedimiento quirúrgico" prepend-icon="" variant="outlined" clearable :error-messages="errors.procedimientoId" @update:model-value="errors.procedimientoId = ''"></VAutocomplete>
     </div>
 
     <div class="flex justify-between mt-2">

@@ -1,3 +1,5 @@
+import { parseJwt } from "../api/utils/parseJwt"
+
 export default defineEventHandler(async (event) => {
   const { secure } = await getUserSession(event)
   const now = new Date()
@@ -33,14 +35,14 @@ export default defineEventHandler(async (event) => {
         }
       })
 
-      const time = responseDate.getTime() + (response.expires_in ?? 0) * 1000
+      const payload = parseJwt(response.access_token)
 
       await setUserSession(event, {
         secure: {
           token: {
             access_token: response.access_token,
             refresh_token: response.refresh_token,
-            expires_in: time
+            expires_in: new Date(payload.exp * 1000)
           }
         }
       }, {

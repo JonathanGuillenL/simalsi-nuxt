@@ -1,26 +1,7 @@
+import { parseJwt } from "../utils/parseJwt"
+
 export default defineOAuthKeycloakEventHandler({
   async onSuccess(event, { user, tokens }) {
-    const now = new Date()
-    const time = now.getTime() + tokens.expires_in * 1000
-
-    function parseJwt (token: string) {
-      try {
-        const base64Url = token.split('.')[1]  // payload is the 2nd part
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
-        )
-
-        return JSON.parse(jsonPayload)
-      } catch (e) {
-        console.error("Invalid token", e)
-        return null
-      }
-    }
-
     const payload = parseJwt(tokens.access_token)
 
     await setUserSession(event, {
@@ -29,7 +10,7 @@ export default defineOAuthKeycloakEventHandler({
         token: {
           access_token: tokens.access_token,
           refresh_token: tokens.refresh_token,
-          expires_in: time
+          expires_in: new Date(payload.exp * 1000)
         }
       }
     }, {
