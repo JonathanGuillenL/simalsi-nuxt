@@ -44,7 +44,7 @@ function onClickHandle() {
       body: regionRequest.value,
       headers: useRequestHeaders(['cookie']),
     }).then(() => {
-      sweetAlert.successAlert('Region anátomica registrada', 'La region anátomica ha sido registrada correctamente')
+      sweetAlert.successAlert('Region anatómica registrada', 'La region anatómica ha sido registrada correctamente')
             .then(() => router.push({ name: 'region' }))
     }).catch(error => {
       if (!error.data.data.errors && error.data.data.error) {
@@ -59,7 +59,7 @@ function onClickHandle() {
       body: regionRequest.value,
       headers: useRequestHeaders(['cookie']),
     }).then(() => {
-      sweetAlert.successAlert('Region anátomica actualizada', 'La region anátomica ha sido actualizada correctamente')
+      sweetAlert.successAlert('Region anatómica actualizada', 'La region anatómica ha sido actualizada correctamente')
       .then(() => {
         router.push({ name: 'region' })
       })
@@ -76,7 +76,7 @@ function onClickHandle() {
 
 <template>
   <div class="font-semibold text-xl text-stone-700 pt-8 px-10">
-    <button class="text-blue-500" @click="$router.back()">Administración de regiones anátomicas</button>
+    <button class="text-blue-500" @click="$router.back()">Administración de regiones anatómicas</button>
     /
     <span v-if="edit">{{ regionRequest.descripcion }}</span>
     <template v-else>Registrar region anátomica</template>

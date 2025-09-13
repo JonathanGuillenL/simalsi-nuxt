@@ -25,6 +25,7 @@ const queryParams = computed(() => {
 
 const criterioItems = [
   { title: 'ID de servicio', value: 'id' },
+  { title: 'Descripción', value: 'descripcion' },
   { title: 'Estado', value: 'estado' },
 ]
 

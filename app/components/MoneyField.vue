@@ -46,7 +46,6 @@ const montoSolicitadoComputed = computed({
     :label="props.label"
     type="text"
     variant="outlined"
-    color="blue"
     :error-messages="props.errorMessages"
   ></v-text-field>
 </template>

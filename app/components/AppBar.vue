@@ -78,8 +78,28 @@ const { match } = useWindowSize(640)
             <span>Cliente</span>
           </NuxtLink>
         </li>
+        <li>
+          <NuxtLink
+            to="/metodo-pago"
+            class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
+            active-class="bg-blue-100 !border-stone-200"
+          >
+            <VIcon class="mr-2" icon="fa fa-wallet" size="x-small" />
+            <span>Método de pago</span>
+          </NuxtLink>
+        </li>
+        <li>
+          <NuxtLink
+            to="/moneda"
+            class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
+            active-class="bg-blue-100 !border-stone-200"
+          >
+            <VIcon class="mr-2" icon="fa fa-coins" size="x-small" />
+            <span>Moneda</span>
+          </NuxtLink>
+        </li>
 
-        <div class="text-sm text-black mt-5">Facturación</div>
+        <div class="text-sm text-black mt-5">Servicios</div>
         <li>
           <NuxtLink
             to="/procedimiento"

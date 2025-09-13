@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
   register: {
     type: Boolean,
     default: false
@@ -8,8 +8,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  defaultCriteria: String,
-  criteriaValue: String
 })
 
 defineEmits(['select'])
@@ -22,18 +20,16 @@ const queryParams = computed(() => {
 
   q.page = parseInt(route.query.page?.toString() ?? '1') - 1,
   q.size = parseInt(route.query.size?.toString() ?? '5')
-  if (props.defaultCriteria && props.criteriaValue) {
-    q[props.defaultCriteria] = props.criteriaValue
-  }
   return q
 })
 
 const criterioItems = [
-  { title: 'ID de procedimiento', value: 'id' },
+  { title: 'ID de método de pago', value: 'id' },
   { title: 'Descripción', value: 'descripcion' },
+  { title: 'Estado', value: 'estado' },
 ]
 
-const { data } = await useLazyFetch<Page<any>>('/api/procedimiento/page', {
+const { data } = await useLazyFetch<Page<any>>('/api/metodo/page', {
   headers: useRequestHeaders(['cookie']),
   query: queryParams,
 })
@@ -56,9 +52,9 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
 <template>
   <div class="flex flex-wrap items-center justify-between">
     <router-link
-      to="/procedimiento/store"
+      to="/metodo-pago/store"
       class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar procedimiento</router-link>
+    >Registrar método de pago</router-link>
 
     <SearchCriteria
       :items="criterioItems"
@@ -73,7 +69,7 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
         <tr>
           <th class="px-6 py-3">ID</th>
           <th class="px-6 py-3">Descripción</th>
-          <th class="px-6 py-3">Región anátomica</th>
+          <th class="px-6 py-3">Estado</th>
           <th class="px-6 py-3">Acciones</th>
         </tr>
       </thead>
@@ -86,7 +82,8 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
             {{ item.descripcion }}
           </td>
           <td class="border px-6 py-3">
-            {{ item.regionAnatomica?.descripcion }}
+            <span v-if="item.deletedAt" class="text-xs bg-red-500 text-white font-semibold rounded-xl py-1 px-2 mx-2">Inactivo</span>
+            <span v-else class="text-xs bg-lime-500 text-white font-semibold rounded-xl py-1 px-2 mx-2">Activo</span>
           </td>
           <td v-if="selector" class="border px-2 py-2">
             <button
@@ -96,7 +93,7 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
           </td>
           <td v-else class="border px-6 py-3">
             <NuxtLink
-              :to="'/procedimiento/' + item.id"
+              :to="'/metodo-pago/' + item.id"
               class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"
             >
               Ver

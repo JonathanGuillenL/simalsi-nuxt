@@ -26,7 +26,6 @@ const queryParams = computed(() => {
 const criterioItems = [
   { title: 'ID de region', value: 'id' },
   { title: 'Descripción', value: 'descripcion' },
-  { title: 'Estado', value: 'estado' },
 ]
 
 const { data } = await useLazyFetch<Page<any>>('/api/region/page', {
