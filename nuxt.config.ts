@@ -5,7 +5,8 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     'nuxt-auth-utils',
-    'vuetify-nuxt-module'
+    'vuetify-nuxt-module',
+    'nuxt-echarts'
   ],
   runtimeConfig: {
     apiBase: '',
@@ -38,5 +39,10 @@ export default defineNuxtConfig({
         defaultSet: 'fa'
       }
     }
+  },
+  echarts: {
+    renderer: 'canvas',
+    charts: ['PieChart', 'BarChart', 'MapChart'],
+    components: ['VisualMapComponent', 'GridComponent', 'TitleComponent', 'TooltipComponent', 'LegendComponent']
   }
 })
