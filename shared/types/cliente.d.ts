@@ -37,10 +37,12 @@ declare interface ClienteResponse {
   nombre: string
   razonSocial: string
   ruc: string
+  departamentoId: number | null
+  municipioId: number | null
 
   // Cliente espontáneo
-  hasPaciente: boolean
-  personaId: number
+  pacienteId: number | null
+  medicoTratanteId: number | null
 
   // Medico afiliado
   codigoSanitario: string | null
@@ -51,6 +53,8 @@ declare interface ClienteCreateRequest {
   nombre: string
   razonSocial: string
   ruc: string
+  departamentoId: number | null
+  municipioId: number | null
 
   // Persona natural
   nombres: string
@@ -67,6 +71,8 @@ declare interface ClienteCreateRequest {
   pacienteId: number | null
 
   // Médico afiliado
+  hasMedicoTratante: boolean
+  medicoTratanteId: number | null
   codigoSanitario: string
 
   tipoCliente: string | null

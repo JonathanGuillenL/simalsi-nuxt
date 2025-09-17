@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineProps<{
     open: boolean,
+    notCliente: boolean
 }>()
 
 const model = defineModel<number | null>()
@@ -30,7 +31,7 @@ function toggleHandler() {
             <v-icon icon="fa fa-x" size="x-small"></v-icon>
           </button>
         </div>
-        <MedicoTratanteTable :selector="true" @select="handleSeleccionar" />
+        <MedicoTratanteTable :not-cliente="notCliente" :register="false" :selector="true" @select="handleSeleccionar" />
       </div>
     </div>
   </teleport>

@@ -63,10 +63,12 @@ function mapTipoCliente(tipo: string) {
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <router-link
+    <NuxtLink
+      v-if="register"
       to="/cliente/store"
       class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar cliente</router-link>
+    >Registrar cliente</NuxtLink>
+    <div v-else></div>
 
     <SearchCriteria
       :items="criterioItems"

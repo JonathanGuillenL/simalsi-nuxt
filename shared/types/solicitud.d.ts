@@ -4,6 +4,7 @@ declare interface SolicitudPageResponse {
   paciente: string
   medicoTratante: string
   servicio: string
+  precio: number
   solicitudEstado: string
   createdAt: string | null
   deletedAt: string | null

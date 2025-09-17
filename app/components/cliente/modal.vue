@@ -30,7 +30,7 @@ function toggleHandler() {
             <v-icon icon="fa fa-x" size="x-small"></v-icon>
           </button>
         </div>
-        <ClienteTable :selector="true" @select="handleSeleccionar" />
+        <ClienteTable :register="false" :selector="true" @select="handleSeleccionar" />
       </div>
     </div>
   </teleport>

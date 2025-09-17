@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps({
+const props = defineProps({
   register: {
     type: Boolean,
     default: false
@@ -7,7 +7,11 @@ defineProps({
   selector: {
     type: Boolean,
     default: false
-  }
+  },
+  notCliente: {
+    type: Boolean,
+    default: false
+  },
 })
 
 defineEmits(['select'])
@@ -31,7 +35,8 @@ const criterioItems = [
   { title: 'Estado', value: 'estado' },
 ]
 
-const { data } = await useLazyFetch<Page<PacientePageResponse>>('/api/paciente/page', {
+const url = props.notCliente ? '/api/paciente/no-cliente/page' : '/api/paciente/page'
+const { data } = await useLazyFetch<Page<PacientePageResponse>>(url, {
   headers: useRequestHeaders(['cookie']),
   query: queryParams,
 })
@@ -53,10 +58,11 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <router-link
+    <NuxtLink
+      v-if="register"
       to="/paciente/store"
       class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar paciente</router-link>
+    >Registrar paciente</NuxtLink>
 
     <SearchCriteria
       :items="criterioItems"

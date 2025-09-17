@@ -51,10 +51,12 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <router-link
+    <NuxtLink
+      v-if="register"
       to="/servicio/store"
       class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar servicio</router-link>
+    >Registrar servicio</NuxtLink>
+    <div v-else></div>
 
     <SearchCriteria
       :items="criterioItems"

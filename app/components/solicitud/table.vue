@@ -1,19 +1,22 @@
 <script setup lang="ts">
-const props = defineProps({
-    register: {
-        type: Boolean,
-        default: false
-    },
-    historial: {
-        type: Boolean,
-        default: false
-    },
-    defaultCriteria: String,
-    criteriaValue: String
-})
+import { SimalsiRoles } from '~/constants/roles';
+
+const props = defineProps<{
+  noFacturada?: boolean,
+  nfclienteId?: number,
+  seleccionadas?: SolicitudPageResponse[],
+  register?: boolean,
+  selector?: boolean,
+  historial?: boolean,
+  defaultCriteria?: string,
+  criteriaValue?: string
+}>()
+
+defineEmits(['select'])
 
 const route = useRoute()
 const router = useRouter()
+const { isAuthorized} = useAuth()
 
 const queryParams = computed(() => {
   const q: Record<string, any> = { ...route.query }
@@ -34,7 +37,16 @@ const criterioItems = [
   { title: 'Fecha', value: 'fecha' },
 ]
 
-const { data, pending } = await useLazyFetch<Page<SolicitudPageResponse>>('/api/solicitud/page', {
+let url;
+if (props.noFacturada) {
+  url = '/api/solicitud/no-facturada/' + props.nfclienteId
+} else if (props.historial) {
+  url = '/api/solicitud/historial'
+} else {
+  url = '/api/solicitud/page'
+}
+
+const { data, pending } = await useLazyFetch<Page<SolicitudPageResponse>>(url, {
   headers: useRequestHeaders(['cookie']),
   query: queryParams,
 })
@@ -75,10 +87,12 @@ async function handlePdfClick(id: number) {
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <router-link
+    <NuxtLink
+      v-if="register"
       to="/solicitud/store"
       class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar solicitud</router-link>
+    >Registrar solicitud</NuxtLink>
+    <div v-else></div>
 
     <SearchCriteria
       :items="criterioItems"
@@ -91,6 +105,7 @@ async function handlePdfClick(id: number) {
     <table class="text-left w-full">
       <thead class="text-sm bg-gray-100">
         <tr>
+          <th v-if="noFacturada" class="px-6 py-3">Seleccionar</th>
           <th class="px-6 py-3">ID</th>
           <th class="px-6 py-3">Fecha de solicitud</th>
           <th class="px-6 py-3">Paciente</th>
@@ -103,6 +118,10 @@ async function handlePdfClick(id: number) {
       </thead>
       <tbody v-if="!pending" class="bg-white">
         <tr v-for="item in data?.data" :key="item.id" class="border-b hover:bg-gray-50">
+          <td v-if="noFacturada && seleccionadas" class="border px-2 py-2 text-center">
+            <input type="checkbox" :value="item.id" @change="$emit('select', item)"
+                :checked="seleccionadas.some(s => s.id === item.id)">
+          </td>
           <td class="border px-6 py-3">
             {{ item.id }}
           </td>
@@ -133,12 +152,27 @@ async function handlePdfClick(id: number) {
               >
                 <v-icon class="fa-solid fa-file-pdf"></v-icon>
               </button>
-              <NuxtLink
-                :to="'/paciente/' + item.id"
-                class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"
-              >
-                Ver
-              </NuxtLink>
+              <AuthState>
+                <template #default="{ user }">
+                  <NuxtLink
+                    v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_HISTOTECNOLOGO]))"
+                    :to="'/muestra/' + item.id"
+                    class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"
+                  >
+                    Ver
+                  </NuxtLink>
+                  <NuxtLink
+                    v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_PATOLOGO]))"
+                    :to="'/resultado/' + item.id"
+                    class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"
+                  >
+                    Ver
+                  </NuxtLink>
+                </template>
+                <template #placeholder>
+                  <span class="animate-pulse">Cargando...</span>
+                </template>
+              </AuthState>
             </div>
           </td>
         </tr>

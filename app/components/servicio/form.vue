@@ -26,7 +26,6 @@ const router = useRouter()
 const route = useRoute()
 const loading = ref(true)
 const id = computed(() => route.params.id)
-const mount = ref(true)
 
 const regionesAnatomicas = ref<any>([])
 const procedimientos = ref<any>([])
@@ -69,7 +68,6 @@ watch(() => servicioRequest.value.regionAnatomicaId, async () => {
         procedimientos.value = response.map(val => ({ title: val.descripcion, value: val.id }))
       }
     })
-    mount.value = false
   }
 })
 

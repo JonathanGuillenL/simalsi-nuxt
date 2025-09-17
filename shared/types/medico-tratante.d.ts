@@ -8,7 +8,7 @@ declare interface MedicoTratantePageResponse {
 }
 
 declare interface MedicoTratanteResponse {
-  id: string
+  id: number
   nombres: string
   apellidos: string
   codigoSanitario: string

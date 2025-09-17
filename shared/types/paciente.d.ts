@@ -3,6 +3,8 @@ declare type Sexo = 'MASCULINO' | 'FEMENINO';
 declare interface PacientePageResponse {
   id: number
   nombre: string
+  nombres: string
+  apellidos: string
   sexo: string
   edad: number
   nacimiento: string
@@ -12,7 +14,7 @@ declare interface PacientePageResponse {
 }
 
 declare interface PacienteResponse {
-  id: string
+  id: number
   nombres: string
   apellidos: string
   edad: number
