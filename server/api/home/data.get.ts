@@ -8,12 +8,13 @@ export default defineEventHandler(async (event) => {
     body: {
       query: `
         query {
-            count {
-                solicitudCount {
-                    cantidad
-                    estado
-                }
+          count {
+            solicitudCount {
+              year
+              month
+              count
             }
+          }
         }
       `
     },
@@ -22,5 +23,5 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return data.data.count.solicitudCount.map(sc => ({ name: sc.estado, value: sc.cantidad }))
+  return data.data.count.solicitudCount
 })
