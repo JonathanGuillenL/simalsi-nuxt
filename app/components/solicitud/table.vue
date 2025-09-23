@@ -16,7 +16,7 @@ defineEmits(['select'])
 
 const route = useRoute()
 const router = useRouter()
-const { isAuthorized} = useAuth()
+const { isAuthorized } = useAuth()
 
 const queryParams = computed(() => {
   const q: Record<string, any> = { ...route.query }
@@ -33,7 +33,8 @@ const criterioItems = [
   { title: 'ID de solicitud', value: 'id' },
   { title: 'Nombre de paciente', value: 'pacienteNombre' },
   { title: 'Nombre de médico tratante', value: 'medicoNombre' },
-  { title: 'Procedimiento quirúrgico', value: 'procedimiento' },
+  { title: 'Nombre de cliente', value: 'clienteNombre' },
+  { title: 'Servicio', value: 'procedimiento' },
   { title: 'Fecha', value: 'fecha' },
 ]
 
@@ -52,7 +53,7 @@ const { data, pending } = await useLazyFetch<Page<SolicitudPageResponse>>(url, {
 })
 
 function updateQueryParams(page: number, search: boolean = false, filter: Record<string, any> | null = null) {
-  console.log(filter)
+  console.log(page)
   if (filter && filter.fechaInicio && filter.fechaFin) {
     router.push({
       query: {
@@ -67,14 +68,26 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
       [filter.criteria]: filter.criteriaData
     } })
   } else if (search) {
-    router.push({ query: queryParams.value })
+    const query = { ...queryParams.value, page }
+    router.push({ query })
   } else {
     router.push(`?page=${page}&size=${queryParams.value.size}`)
   }
 }
 
-async function handlePdfClick(id: number) {
+async function handlePdfSClick(id: number) {
   const url = await $fetch<string>('/api/solicitud/pdf/' + id, {
+    method: 'POST',
+    headers: useRequestHeaders(['cookie', 'location']),
+  })
+
+  if (url) {
+    window.open(url)
+  }
+}
+
+async function handlePdfRClick(id: number) {
+  const url = await $fetch<string>('/api/resultado/pdf/' + id, {
     method: 'POST',
     headers: useRequestHeaders(['cookie', 'location']),
   })
@@ -87,12 +100,21 @@ async function handlePdfClick(id: number) {
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <NuxtLink
-      v-if="register"
-      to="/solicitud/store"
-      class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar solicitud</NuxtLink>
-    <div v-else></div>
+    <AuthState>
+      <template #default="{ user }">
+        <NuxtLink
+          v-if="register && (user?.roles?.includes(SimalsiRoles.ROLE_ADMIN) || user?.roles?.includes(SimalsiRoles.ROLE_RECEPCIONISTA))"
+          to="/solicitud/store"
+          class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
+        >Registrar solicitud</NuxtLink>
+        <div v-else></div>
+      </template>
+      <template #placeholder>
+        <button class="text-sm font-semibold hover:text-blue-500" disabled>
+          <span class="animate-pulse">Cargando...</span>
+        </button>
+      </template>
+    </AuthState>
 
     <SearchCriteria
       :items="criterioItems"
@@ -110,6 +132,7 @@ async function handlePdfClick(id: number) {
           <th class="px-6 py-3">Fecha de solicitud</th>
           <th class="px-6 py-3">Paciente</th>
           <th class="px-6 py-3">Médico tratante</th>
+          <th class="px-6 py-3">Cliente</th>
           <th class="px-6 py-3">Servicio</th>
           <th class="px-6 py-3">Proceso</th>
           <th class="px-6 py-3">Estado</th>
@@ -135,6 +158,9 @@ async function handlePdfClick(id: number) {
             {{ item.medicoTratante ?? '-' }}
           </td>
           <td class="border px-6 py-3">
+            {{ item.cliente }}
+          </td>
+          <td class="border px-6 py-3">
             {{ item.servicio }}
           </td>
           <td class="border px-6 py-3">
@@ -145,18 +171,19 @@ async function handlePdfClick(id: number) {
             <span v-else class="text-xs bg-lime-500 text-white font-semibold rounded-xl py-1 px-2 mx-2">Activo</span>
           </td>
           <td class="border px-6 py-3">
-            <div class="flex">
-              <button
-                @click="handlePdfClick(item.id)"
-                class="font-semibold text-sm text-white bg-red-400 rounded-md hover:shadow-lg p-2"
-              >
-                <v-icon class="fa-solid fa-file-pdf"></v-icon>
-              </button>
+            <div class="flex gap-1 items-center">
               <AuthState>
                 <template #default="{ user }">
                   <NuxtLink
+                    v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_RECEPCIONISTA, SimalsiRoles.ROLE_ADMIN]))"
+                    :to="'/solicitud/' + item.id"
+                    class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"
+                  >
+                    Ver
+                  </NuxtLink>
+                  <NuxtLink
                     v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_HISTOTECNOLOGO]))"
-                    :to="'/muestra/' + item.id"
+                    :to="historial ? '/historial/muestra/' + item.id : '/solicitud/muestra/' + item.id"
                     class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2"
                   >
                     Ver
@@ -173,6 +200,21 @@ async function handlePdfClick(id: number) {
                   <span class="animate-pulse">Cargando...</span>
                 </template>
               </AuthState>
+              <button
+                @click="handlePdfSClick(item.id)"
+                class="font-semibold text-xs text-white bg-red-400 rounded-md hover:shadow-lg p-2"
+              >
+                <v-icon class="fa-solid fa-file-pdf"></v-icon>
+                <div>Solicitud</div>
+              </button>
+              <button
+                v-if="item.solicitudEstado === 'FINALIZADO'"
+                @click="handlePdfRClick(item.id)"
+                class="font-semibold text-xs text-white bg-red-400 rounded-md hover:shadow-lg p-2"
+              >
+                <v-icon class="fa-solid fa-file-pdf"></v-icon>
+                <div>Resultado</div>
+              </button>
             </div>
           </td>
         </tr>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useSweetAlert from '~/composables/useSweetAlert'
+import { SimalsiRoles } from '~/constants/roles'
 
 const props = defineProps({
   id: String,
@@ -29,6 +30,17 @@ const router = useRouter()
 const route = useRoute()
 const loading = ref(true)
 const id = computed(() => route.params.id)
+const edad = computed(() => {
+  if (!pacienteRequest.value.nacimiento) return ''
+  const today = new Date()
+  const birthDate = new Date(pacienteRequest.value.nacimiento)
+  let age = today.getFullYear() - birthDate.getFullYear()
+  const month = today.getMonth() - birthDate.getMonth()
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+    age--
+  }
+  return age
+})
 
 const sexoItems = [
     { title: 'Masculino', value: 'MASCULINO' },
@@ -166,7 +178,7 @@ function onEnableHandler() {
       <v-text-field v-model="pacienteRequest.apellidos" label="Apellidos" variant="outlined" :error-messages="errors.apellidos" @update:model-value="errors.apellidos = ''"></v-text-field>
 
       <v-date-input v-model="pacienteRequest.nacimiento" label="Fecha de nacimiento" prepend-icon="" variant="outlined" :error-messages="errors.nacimiento" @update:model-value="errors.nacimiento = ''"></v-date-input>
-      <v-text-field v-if="edit && pacienteResponse" v-model="pacienteResponse.edad" label="edad" prepend-icon="" variant="outlined" readonly></v-text-field>
+      <v-text-field v-if="edit && pacienteResponse" v-model="edad" label="edad" prepend-icon="" variant="outlined" readonly></v-text-field>
       <v-select v-model="pacienteRequest.sexo" :items="sexoItems" label="Sexo" prepend-icon="" variant="outlined" :error-messages="errors.sexo"  @update:model-value="errors.sexo = ''"></v-select>
     </div>
 
@@ -189,9 +201,18 @@ function onEnableHandler() {
     </div>
 
     <div class="flex justify-between mt-2">
-      <button v-if="edit && pacienteResponse?.deletedAt" class="font-semibold text-sm text-white bg-green-600 rounded-md hover:shadow-lg px-3 py-2" @click="onEnableHandler">Habilitar</button>
-      <button v-else-if="edit" class="font-semibold text-sm text-white bg-red-500 disabled:bg-gray-400 disabled:shadow-none  rounded-md hover:shadow-lg px-3 py-2" :disabled="edit && loading" @click="onDeleteHandler">Eliminar</button>
-      <button v-else class="font-semibold text-sm text-white bg-red-500 rounded-md hover:shadow-lg px-3 py-2" @click="$router.back()">Cancelar</button>
+      <AuthState>
+        <template #default="{ user }">
+          <button v-if="edit && pacienteResponse?.deletedAt && user?.roles.includes(SimalsiRoles.ROLE_ADMIN)" class="font-semibold text-sm text-white bg-green-600 rounded-md hover:shadow-lg px-3 py-2" @click="onEnableHandler">Habilitar</button>
+          <button v-else-if="edit && user?.roles.includes(SimalsiRoles.ROLE_ADMIN)" class="font-semibold text-sm text-white bg-red-500 disabled:bg-gray-400 disabled:shadow-none  rounded-md hover:shadow-lg px-3 py-2" :disabled="edit && loading" @click="onDeleteHandler">Eliminar</button>
+          <button v-else class="font-semibold text-sm text-white bg-red-500 rounded-md hover:shadow-lg px-3 py-2" @click="$router.back()">Cancelar</button>
+        </template>
+        <template #placeholder>
+          <button class="text-sm font-semibold hover:text-blue-500" disabled>
+            <span class="animate-pulse">Cargando...</span>
+          </button>
+        </template>
+      </AuthState>
       <button class="font-semibold text-sm text-white bg-blue-500 disabled:bg-gray-400 disabled:shadow-none  rounded-md hover:shadow-lg px-3 py-2" :disabled="edit && loading" @click="onClickHandle">Guardar</button>
     </div>
   </div>

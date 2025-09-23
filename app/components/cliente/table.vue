@@ -26,7 +26,8 @@ const queryParams = computed(() => {
 const criterioItems = [
   { title: 'ID de cliente', value: 'id' },
   { title: 'Nombre', value: 'nombres' },
-  { title: 'Usuario', value: 'usuario' },
+  { title: 'Tipo de cliente', value: 'tipoCliente' },
+  { title: 'Email', value: 'Email' },
   { title: 'Teléfono', value: 'telefono' },
   { title: 'Estado', value: 'estado' },
 ]

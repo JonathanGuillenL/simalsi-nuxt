@@ -1,4 +1,5 @@
 declare interface LaminaCaja {
+    id: number
     fila: number
     columna: number
     cajaId: number

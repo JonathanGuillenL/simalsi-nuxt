@@ -1,0 +1,3 @@
+<template>
+  <SolicitudMuestraForm />
+</template>

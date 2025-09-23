@@ -1,14 +1,12 @@
 <script setup lang="ts">
-defineProps({
-  register: {
-    type: Boolean,
-    default: false
-  },
-  selector: {
-    type: Boolean,
-    default: false
-  }
-})
+import { SimalsiRoles } from '~/constants/roles';
+
+const props = defineProps<{
+  register?: boolean,
+  selector?: boolean,
+  defaultCriteria?: string,
+  criteriaValue?: string
+}>()
 
 defineEmits(['select'])
 
@@ -20,6 +18,9 @@ const queryParams = computed(() => {
 
   q.page = parseInt(route.query.page?.toString() ?? '1') - 1,
   q.size = parseInt(route.query.size?.toString() ?? '5')
+  if (props.defaultCriteria && props.criteriaValue) {
+    q[props.defaultCriteria] = props.criteriaValue
+  }
   return q
 })
 
@@ -30,6 +31,9 @@ const criterioItems = [
 const { data } = await useLazyFetch<Page<FacturaPageResponse>>('/api/factura/page', {
   headers: useRequestHeaders(['cookie']),
   query: queryParams,
+  onResponse: (response) => {
+    console.log(response.response._data)
+  }
 })
 
 function updateQueryParams(page: number, search: boolean = false, filter: Record<string, any> | null = null) {
@@ -60,10 +64,21 @@ async function handlePdfClick(id: number) {
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <NuxtLink
-      to="/factura/store"
-      class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar factura</NuxtLink>
+    <AuthState>
+      <template #default="{ user }">
+        <NuxtLink
+        v-if="register && (user?.roles?.includes(SimalsiRoles.ROLE_ADMIN) || user?.roles?.includes(SimalsiRoles.ROLE_RECEPCIONISTA))"
+          to="/factura/store"
+          class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
+        >Registrar factura</NuxtLink>
+        <div v-else></div>
+      </template>
+      <template #placeholder>
+        <button class="text-sm font-semibold hover:text-blue-500" disabled>
+          <span class="animate-pulse">Cargando...</span>
+        </button>
+      </template>
+    </AuthState>
 
     <SearchCriteria
       :items="criterioItems"

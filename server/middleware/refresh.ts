@@ -58,6 +58,7 @@ export default defineEventHandler(async (event) => {
 
     } catch (error: any) {
       await clearUserSession(event)
+      // return sendRedirect(event, "https://example.com", 302) // en refresh.ts
     }
   }
 })

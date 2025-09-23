@@ -4,6 +4,8 @@ export default defineEventHandler(async (event) => {
   const { secure } = await requireUserSession(event)
   const query = getQuery(event)
 
+  console.log('secure', secure)
+
   const data = await $fetch<Page<PacientePageResponse>>(apiBase + '/paciente', {
     query,
     headers: {

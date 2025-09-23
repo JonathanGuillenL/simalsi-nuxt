@@ -30,7 +30,6 @@ const queryParams = computed(() => {
 const criterioItems = [
   { title: 'ID de paciente', value: 'id' },
   { title: 'Nombre', value: 'nombres' },
-  { title: 'Sexo', value: 'sexo' },
   { title: 'Teléfono', value: 'telefono' },
   { title: 'Estado', value: 'estado' },
 ]

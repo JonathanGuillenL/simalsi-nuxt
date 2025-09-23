@@ -37,7 +37,10 @@ onMounted(() => {
     headers: useRequestHeaders(['cookie']),
   }).then(response => {
     solicitudResponse.value = response
-    console.log(response)
+    if (response.muestra) {
+      muestra.value = response.muestra
+    }
+    console.log(muestra.value)
     loading.value = false
   }).catch(error => {
     if (!error.data.data.errors && error.data.data.error) {
@@ -52,7 +55,7 @@ function handleGuardar() {
     body: muestra.value,
     headers: useRequestHeaders(['cookie']),
   }).then(() => {
-    sweetAlert.successAlert('Muestra registrada', 'La muestra ha sido registrada correctamente')
+    sweetAlert.successAlert('Datos de muestra registrados', 'Los datos de la muestra han sido registrados correctamente')
     .then(() => {
       router.push({ name: 'solicitud' })
     })
@@ -63,6 +66,14 @@ function handleGuardar() {
       errors.value = error.data.data.errors
     }
   })
+}
+
+function validateIngreso(date: unknown) {
+  return date instanceof Date && date <= new Date() && date >= new Date(solicitudResponse.value.fechaSolicitud);
+}
+
+function validateProcesamiento(date: unknown) {
+  return date instanceof Date && date >= (new Date(muestra.value.fechaIngreso) ?? new Date()) && date <= new Date()
 }
 </script>
 
@@ -191,7 +202,7 @@ function handleGuardar() {
             </div>
         </div>
 
-        <div>
+        <div v-if="solicitudResponse.medicoTratante">
             <div class="flex items-center space-x-1 mb-2">
                 <h1 class="text-lg font-semibold">Información del médico tratante</h1>
             </div>
@@ -217,7 +228,7 @@ function handleGuardar() {
                 <h1 class="text-lg font-semibold">Datos de la muestra</h1>
             </div>
 
-            <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div v-if="!solicitudResponse.muestra" class="grid grid-cols-2 gap-x-4 gap-y-3">
                 <div class="col-span-2">
                     <label for="" class="">Fecha de toma de la muestra</label>
                     <input :value="fechaTomaPrint" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
@@ -232,26 +243,61 @@ function handleGuardar() {
                     <textarea :value="solicitudResponse.observaciones" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id=""></textarea>
                 </div>
             </div>
+            <div v-else class="grid grid-cols-2 gap-x-4 gap-y-3">
+              <div class="col-span-2">
+                  <label for="" class="">Fecha de toma de la muestra</label>
+                  <input :value="fechaTomaPrint" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              </div>
+              <div>
+                  <label for="" class="">Región anatómica</label>
+                  <input :value="solicitudResponse?.servicioLaboratorio?.procedimientoQuirurgico.regionAnatomica.descripcion" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              </div>
+              <div>
+                  <label for="" class="">Procedimiento quirúrgico</label>
+                  <input :value="solicitudResponse?.servicioLaboratorio?.procedimientoQuirurgico.descripcion" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              </div>
+
+              <div class="col-span-1">
+                  <label for="" class="">Fecha de ingreso al laboratorio</label>
+                  <input :value="solicitudResponse?.muestra?.fechaIngreso" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              </div>
+
+              <div class="col-span-1">
+                  <label for="" class="">Fecha de procesamiento</label>
+                  <input :value="solicitudResponse?.muestra?.fechaProcesamiento" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              </div>
+
+              <div class="col-span-1">
+                  <label for="" class="">Númeo de cortes</label>
+                  <input :value="solicitudResponse?.muestra?.numeroDeCortes" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              </div>
+
+              <div class="col-span-1">
+                  <label for="" class="">Peso de la muestra</label>
+                  <input :value="solicitudResponse?.muestra?.pesoMuestra" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              </div>
+
+              <div class="col-span-2">
+                  <label for="" class="">Descripción macroscópica</label>
+                  <textarea :value="solicitudResponse?.muestra?.descripcionMacroscopica" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id=""></textarea>
+              </div>
+
+              <div class="col-span-2">
+                  <label for="" class="">Observaciones</label>
+                  <textarea :value="solicitudResponse.observaciones" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id=""></textarea>
+              </div>
+            </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
-          <v-date-input v-model="muestra.fechaIngreso" label="Fecha de ingreso al laboratorio" prepend-icon="" variant="outlined" :error-messages="errors.fechaIngreso"></v-date-input>
-          <v-date-input v-model="muestra.fechaProcesamiento" label="Fecha de procesamiento" prepend-icon="" variant="outlined" :error-messages="errors.fechaProcesamiento"></v-date-input>
+        <div v-if="!solicitudResponse.muestra" class="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
+          <v-date-input v-model="muestra.fechaIngreso" :allowed-dates="validateIngreso" label="Fecha de ingreso al laboratorio" prepend-icon="" variant="outlined" :error-messages="errors.fechaIngreso" @update:model-value="muestra.fechaProcesamiento = ''"></v-date-input>
+          <v-date-input v-model="muestra.fechaProcesamiento" :allowed-dates="validateProcesamiento" label="Fecha de procesamiento" prepend-icon="" variant="outlined" :error-messages="errors.fechaProcesamiento"></v-date-input>
 
           <v-text-field v-model="muestra.numeroDeCortes" label="Número de cortes" variant="outlined" :error-messages="errors.numeroDeCortes"></v-text-field>
           <v-text-field v-model="muestra.pesoMuestra" label="Peso de la muestra (gramos)" variant="outlined" :error-messages="errors.pesoMuestra"></v-text-field>
 
-          <!-- <v-file-input v-model="archivo" class="col-span-2" @update:modelValue="onFileChanged" label="File input" variant="outlined" accept="image/*" chips multiple></v-file-input>
-
-          <div v-show="imageUrl.length > 0" class="col-span-2">
-              <v-carousel v-model="carousel">
-                  <v-carousel-item v-for="image in imageUrl"
-                      :src="image"
-                  ></v-carousel-item>
-              </v-carousel>
-          </div> -->
-
           <v-textarea v-model="muestra.descripcionMacroscopica" class="col-span-2" label="Descripción macroscópica" variant="outlined" :error-messages="errors.descripcionMacroscopica"></v-textarea>
+        </div>
 
           <div class="col-span-2">
               <LaminaModal v-model="muestra.laminas" :open="modalLamina" @toggle="modalLamina = !modalLamina"></LaminaModal>
@@ -282,7 +328,6 @@ function handleGuardar() {
                   </table>
               </div>
           </div>
-      </div>
 
       <div class="text-sm">Los campos marcados con (<span class="text-red-500">*</span>) son requeridos</div>
       <div class="flex justify-end mt-5">

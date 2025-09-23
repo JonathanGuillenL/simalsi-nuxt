@@ -16,10 +16,8 @@ const emit = defineEmits(['toggle'])
         <div v-if="open && imageUrl" class="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
             <div class="bg-white border mx-auto max-w-5xl rounded-lg p-6 my-20">
                 <div class="flex items-center justify-between mb-2">
-                    <h1 class="text-2xl font-semibold">Agregar lamina</h1>
+                    <h1 class="text-2xl font-semibold">Imagen adjunta</h1>
                 </div>
-
-                <div class="text-base text-neutral-600 mb-4">Información de pago a realizar</div>
 
                 <div class="grid gap-y-8">
                     <img class="border-8" :src="imageUrl" zoom-type="drag" :zoom-scale="4" :step="1" />

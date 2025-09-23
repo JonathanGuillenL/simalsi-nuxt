@@ -24,7 +24,7 @@ const float = ref(false)
           <button
             class="text-sm font-semibold hover:text-blue-500"
             @click="float = true">
-            {{ user?.given_name }}
+            {{ user?.preferred_username }}
           </button>
         </template>
         <template #placeholder>

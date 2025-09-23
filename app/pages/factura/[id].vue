@@ -159,13 +159,13 @@ async function handlePdfClick(id: number) {
                 <table class="text-left w-full">
                     <thead class="text-sm bg-gray-100">
                         <tr>
-                            <th class="px-6 py-3">ID</th>
+                            <th class="px-6 py-3">ID de solicitud</th>
                             <th class="px-6 py-3">Fecha de solicitud</th>
                             <th class="px-6 py-3">Paciente</th>
                             <th class="px-6 py-3">Médico tratante</th>
                             <th class="px-6 py-3">Procedimiento</th>
                             <th class="px-6 py-3 w-1/6">Precio</th>
-                            <th class="px-6 py-3">Acciones</th>
+                            <th class="px-6 py-3">Solicitud</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">

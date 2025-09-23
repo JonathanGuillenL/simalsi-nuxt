@@ -35,7 +35,7 @@ function toggleHandler() {
 
 function confirmarSeleccion() {
     emit('update:modelValue', Array.from(seleccionadas.value))
-    emit('toggle')
+    toggleHandler()
 }
 </script>
 

@@ -3,6 +3,7 @@ declare interface SolicitudPageResponse {
   fechaSolicitud: string
   paciente: string
   medicoTratante: string
+  cliente: string
   servicio: string
   precio: number
   solicitudEstado: string

@@ -2,5 +2,6 @@ declare interface AdjuntarArchivoResponse {
     id: number
     descripcion: string
     ubicacion: string
-    activo: boolean
+    createdAt: string | null
+    deletedAt: string | null
 }

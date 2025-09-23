@@ -77,6 +77,13 @@ function handleGuardar() {
     headers: useRequestHeaders(['cookie']),
   }).then(response => {
     model.value = response
+    pago.value = {
+        observaciones: '',
+        referencia: '',
+        metodoPagoId: null,
+        monedaId: null,
+        monto: 0
+    }
     sweetAlert.successAlert('Pago registrado', 'El pago ha sido registrado correctamente')
           .then(() => emit('toggle'))
   }).catch(error => {
@@ -101,15 +108,15 @@ function handleGuardar() {
                 <div class="text-base text-neutral-600 mb-4">Información de pago a realizar</div>
 
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2">
-                    <v-select label="Moneda" :items="monedas" v-model="pago.monedaId" variant="outlined" density="compact"></v-select>
+                    <v-select label="Moneda" :items="monedas" v-model="pago.monedaId" variant="outlined" density="compact" :error-messages="errors.monedaId"></v-select>
 
-                    <money-field label="Monto" variant="outlined" v-model="pago.monto" :signo-monetario="moneda.signoMonetario" density="compact"></money-field>
+                    <money-field label="Monto" variant="outlined" v-model="pago.monto" :signo-monetario="moneda.signoMonetario" density="compact" :error-messages="errors.monto"></money-field>
 
                     <money-field label="Tipo de cambio" v-model:model-value="moneda.tipoCambio" variant="outlined" density="compact" :disabled="true"></money-field>
 
                     <money-field label="Conversión" variant="outlined" v-model:model-value="conversion" density="compact" :disabled="true"></money-field>
 
-                    <v-select class="col-span-2" label="Metodo de pago" v-model="pago.metodoPagoId" :items="metodoPago" variant="outlined" density="compact"></v-select>
+                    <v-select class="col-span-2" label="Metodo de pago" v-model="pago.metodoPagoId" :items="metodoPago" variant="outlined" density="compact" :error-messages="errors.metodoPagoId"></v-select>
 
                     <v-textarea class="col-span-2" label="Observaciones" variant="outlined" density="compact"></v-textarea>
                 </div>

@@ -24,6 +24,12 @@ const estados: CriteriaItem[] = [
   { title: 'Inactivo', value: 'INACTIVO' }
 ]
 
+const tiposCliente: CriteriaItem[] = [
+  { title: 'Cliente espontáneo', value: 'CLIENTE_ESPONTANEO' },
+  { title: 'Médico afiliado', value: 'MEDICO_AFILIADO' },
+  { title: 'Clínica afiliada', value: 'CLINICA_AFILIADA' }
+]
+
 onMounted(() => {
   const [criteria, valor] = getCriteria() ?? []
 
@@ -70,6 +76,15 @@ function clearCriteriaHandler() {
         variant="outlined"
         density="compact"
       />
+      <VSelect
+        v-if="filters.criteria === 'tipoCliente'"
+        v-model="filters.criteriaData"
+        :label="criterioLabel"
+        :items="tiposCliente"
+        class="w-52"
+        variant="outlined"
+        density="compact"
+      />
       <div v-else-if="filters.criteria == 'fecha'" class="flex space-x-3">
         <VDateInput class="w-52" :label="criterioLabel + ' inicio'" v-model="filters.fechaInicio" prepend-icon="" variant="outlined" density="compact"></VDateInput>
         <VDateInput class="w-52" :label="criterioLabel + ' fin'" v-model="filters.fechaFin" prepend-icon="" variant="outlined" density="compact"></VDateInput>
@@ -81,6 +96,7 @@ function clearCriteriaHandler() {
         class="w-52"
         variant="outlined"
         density="compact"
+        @keyup.enter="emit('search', { ...filters })"
       />
     </div>
     <button

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SimalsiRoles } from '~/constants/roles'
+
 const props = defineProps({
   register: {
     type: Boolean,
@@ -55,10 +57,21 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <router-link
-      to="/procedimiento/store"
-      class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar procedimiento</router-link>
+    <AuthState>
+      <template #default="{ user }">
+        <router-link
+          v-if="user?.roles?.includes(SimalsiRoles.ROLE_ADMIN)"
+          to="/procedimiento/store"
+          class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
+        >Registrar procedimiento</router-link>
+        <div v-else></div>
+      </template>
+      <template #placeholder>
+        <button class="text-sm font-semibold hover:text-blue-500" disabled>
+          <span class="animate-pulse">Cargando...</span>
+        </button>
+      </template>
+    </AuthState>
 
     <SearchCriteria
       :items="criterioItems"

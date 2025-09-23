@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SimalsiRoles } from '~/constants/roles';
+
 defineProps<{
   register?: boolean,
   selector?: boolean,
@@ -46,12 +48,21 @@ function updateQueryParams(page: number, search: boolean = false, filter: Record
 
 <template>
   <div class="flex flex-wrap items-center justify-between">
-    <NuxtLink
-      v-if="register"
-      to="/descuento/store"
-      class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
-    >Registrar descuento</NuxtLink>
-    <div v-else></div>
+    <AuthState>
+      <template #default="{ user }">
+        <NuxtLink
+          v-if="register && user?.roles?.includes(SimalsiRoles.ROLE_ADMIN)"
+          to="/descuento/store"
+          class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2 mb-4"
+        >Registrar descuento</NuxtLink>
+        <div v-else></div>
+      </template>
+      <template #placeholder>
+        <button class="text-sm font-semibold hover:text-blue-500" disabled>
+          <span class="animate-pulse">Cargando...</span>
+        </button>
+      </template>
+    </AuthState>
 
     <SearchCriteria
       :items="criterioItems"

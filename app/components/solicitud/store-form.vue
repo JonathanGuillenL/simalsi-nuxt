@@ -43,7 +43,7 @@ const solicitud = ref<SolicitudCreateRequest>({
   clienteId: null,
   pacienteId: null,
   medicoTratanteId: null,
-  servicioLaboratorioId: 100,
+  servicioLaboratorioId: null,
   fechaTomaMuestra: null,
   observaciones: null,
 })
@@ -172,7 +172,7 @@ function saveHandler() {
 
     <div class="bg-white rounded border overflow-hidden shadow-lg">
       <div class="flex items-center justify-between bg-sky-800 mb-2 px-6 pt-6 pb-3">
-        <h1 class="text-2xl text-white font-semibold">Datos de la muestra</h1>
+        <h1 class="text-2xl text-white font-semibold">Datos de la muestra (<span class="text-red-500">*</span>)</h1>
       </div>
 
       <div class="px-6 pt-3 pb-6">

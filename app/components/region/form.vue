@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useSweetAlert from '~/composables/useSweetAlert'
+import { SimalsiRoles } from '~/constants/roles'
 
 const props = defineProps({
   id: String,
@@ -97,7 +98,16 @@ function onClickHandle() {
     <div class="flex justify-between mt-2">
       <button v-if="!edit" class="font-semibold text-sm text-white bg-red-500 rounded-md hover:shadow-lg px-3 py-2" @click="$router.back()">Cancelar</button>
       <div v-else></div>
-      <button class="font-semibold text-sm text-white bg-blue-500 disabled:bg-gray-400 disabled:shadow-none  rounded-md hover:shadow-lg px-3 py-2" :disabled="edit && loading" @click="onClickHandle">Guardar</button>
+      <AuthState>
+        <template #default="{ user }">
+          <button v-if="user?.roles?.includes(SimalsiRoles.ROLE_ADMIN)" class="font-semibold text-sm text-white bg-blue-500 disabled:bg-gray-400 disabled:shadow-none  rounded-md hover:shadow-lg px-3 py-2" :disabled="edit && loading" @click="onClickHandle">Guardar</button>
+        </template>
+        <template #placeholder>
+          <button class="text-sm font-semibold hover:text-blue-500" disabled>
+            <span class="animate-pulse">Cargando...</span>
+          </button>
+        </template>
+      </AuthState>
     </div>
   </div>
 </template>

@@ -10,7 +10,6 @@ const archivo = ref<File | File[] | null>(null)
 const descripcion = ref('')
 
 const imageUrl = ref<string[]>([])
-const carousel = ref<number>(0)
 const sweetAlert = useSweetAlert()
 
 const emit = defineEmits(['toggle'])
@@ -39,7 +38,6 @@ function onFileChanged(file: File | File[]) {
     } else {
         createImage(file)
     }
-    carousel.value = 0
 }
 
 async function handleAgregar() {
@@ -59,8 +57,11 @@ async function handleAgregar() {
       body: formData,
       headers: useRequestHeaders(['cookie']),
     }).then(response => {
+      model.value?.push(response)
+      archivo.value = null
+      descripcion.value = ''
+      imageUrl.value = []
       sweetAlert.successAlert('Archivo registrado', 'El archivo ha sido registrado correctamente')
-            .then(() => model.value?.push(response))
       emit("toggle")
     }).catch(error => {
       if (!error.data.data.errors && error.data.data.error) {

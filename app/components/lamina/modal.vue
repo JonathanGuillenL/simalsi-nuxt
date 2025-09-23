@@ -9,6 +9,7 @@ const laminas = ref<LaminaCaja[]>([])
 
 const cajas = ref<any[]>([])
 const cajaSeleccionada = ref<CajaResponse | null>(null)
+const cajaLaminas = ref<any[]>([])
 
 onMounted(async () => {
   $fetch('/api/caja', {
@@ -31,9 +32,22 @@ function handleToggleLamina(cajaId: number, fila: number, columna: number) {
     if (index !== -1) {
         laminas.value.splice(index, 1)
     } else {
-        laminas.value.push({ cajaId, fila, columna })
+        laminas.value.push({ id: 0, cajaId, fila, columna })
     }
 }
+
+watch(() => cajaSeleccionada.value, () => {
+  if (cajaSeleccionada.value) {
+    $fetch(`/api/caja/${cajaSeleccionada.value.id}/lamina`, {
+      headers: useRequestHeaders(['cookie']),
+    }).then(response => {
+      if (Array.isArray(response)) {
+        cajaLaminas.value = response
+        console.log(cajaLaminas.value)
+      }
+    })
+  }
+})
 
 function handleAgregar() {
     model.value = JSON.parse(JSON.stringify(laminas.value))
@@ -48,8 +62,6 @@ function handleAgregar() {
                 <div class="flex items-center justify-between mb-2">
                     <h1 class="text-2xl font-semibold">Agregar lamina</h1>
                 </div>
-
-                <div class="text-base text-neutral-600 mb-4">Información de pago a realizar</div>
 
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2">
                     <v-select label="Caja" :items="cajas" v-model="cajaSeleccionada" variant="outlined" density="compact"></v-select>
@@ -69,10 +81,10 @@ function handleAgregar() {
                                     {{ fila }}
                                 </td>
                                 <th v-for="columna in cajaSeleccionada.numeroColumnas" :key="columna" class="px-6 py-3 hover:bg-gray-100">
-                                    <div v-if="cajaSeleccionada.laminas.find(l => l.columna == columna && l.fila == fila)">
+                                    <div v-if="cajaLaminas.find(l => l.columna == columna && l.fila == fila)">
                                         <div class="flex items-center justify-center bg-red-500 w-8 h-8 rounded-full mx-auto">
                                         </div>
-                                        <div class="text-center text-xs">{{ cajaSeleccionada.laminas.find(l => l.columna == columna && l.fila == fila)?.id }}</div>
+                                        <div class="text-center text-xs">{{ cajaLaminas.find(l => l.columna == columna && l.fila == fila)?.id }}</div>
                                     </div>
                                     <div v-else-if="laminas.find(l => l.cajaId == cajaSeleccionada?.id && l.columna == columna && l.fila == fila)">
                                         <button @click="handleToggleLamina(cajaSeleccionada.id, fila, columna)" class="flex items-center justify-center bg-orange-500 w-8 h-8 rounded-full mx-auto">

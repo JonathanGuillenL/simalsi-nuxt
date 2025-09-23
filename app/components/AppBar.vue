@@ -67,6 +67,7 @@ function isAuthorized(userRole: string, roles: unknown[]): boolean {
             </li>
             <li>
               <NuxtLink
+                v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_RECEPCIONISTA, SimalsiRoles.ROLE_HISTOTECNOLOGO, SimalsiRoles.ROLE_PATOLOGO]))"
                 to="/solicitud"
                 class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
                 active-class="bg-blue-100 !border-stone-200"
@@ -77,7 +78,7 @@ function isAuthorized(userRole: string, roles: unknown[]): boolean {
             </li>
             <li>
               <NuxtLink
-                v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_HISTOTECNOLOGO, SimalsiRoles.ROLE_PATOLOGO]))"
+                v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_CLIENTE, SimalsiRoles.ROLE_HISTOTECNOLOGO, SimalsiRoles.ROLE_PATOLOGO]))"
                 to="/historial"
                 class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
                 active-class="bg-blue-100 !border-stone-200"
@@ -87,10 +88,10 @@ function isAuthorized(userRole: string, roles: unknown[]): boolean {
               </NuxtLink>
             </li>
 
-            <div class="text-sm text-black mt-5">Servicios</div>
+            <div v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_RECEPCIONISTA, SimalsiRoles.ROLE_HISTOTECNOLOGO, SimalsiRoles.ROLE_PATOLOGO]))" class="text-sm text-black mt-5">Servicios</div>
             <li>
               <NuxtLink
-              v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_HISTOTECNOLOGO, SimalsiRoles.ROLE_PATOLOGO]))"
+                v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_HISTOTECNOLOGO, SimalsiRoles.ROLE_PATOLOGO]))"
                 to="/procedimiento"
                 class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
                 active-class="bg-blue-100 !border-stone-200"
@@ -122,7 +123,7 @@ function isAuthorized(userRole: string, roles: unknown[]): boolean {
               </NuxtLink>
             </li>
 
-            <div v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_RECEPCIONISTA]))" class="text-sm text-black mt-5">Facturación</div>
+            <div v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_CLIENTE, SimalsiRoles.ROLE_RECEPCIONISTA]))" class="text-sm text-black mt-5">Facturación</div>
             <li>
               <NuxtLink
                 v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_RECEPCIONISTA]))"
@@ -136,7 +137,7 @@ function isAuthorized(userRole: string, roles: unknown[]): boolean {
             </li>
             <li>
               <NuxtLink
-                v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_RECEPCIONISTA]))"
+                v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN, SimalsiRoles.ROLE_CLIENTE, SimalsiRoles.ROLE_RECEPCIONISTA]))"
                 to="/factura"
                 class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
                 active-class="bg-blue-100 !border-stone-200"
@@ -176,6 +177,17 @@ function isAuthorized(userRole: string, roles: unknown[]): boolean {
               >
                 <VIcon class="mr-2" icon="fa fa-percent" size="x-small" />
                 <span>Descuento</span>
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink
+                v-if="user?.roles.some(role => isAuthorized(role, [SimalsiRoles.ROLE_ADMIN]))"
+                to="/colaborador"
+                class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
+                active-class="bg-blue-100 !border-stone-200"
+              >
+                <VIcon class="mr-2" icon="fa fa-user-group" size="x-small" />
+                <span>Colaborador</span>
               </NuxtLink>
             </li>
           </ul>

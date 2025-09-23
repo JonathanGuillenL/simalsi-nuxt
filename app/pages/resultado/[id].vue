@@ -49,7 +49,13 @@ onMounted(() => {
     headers: useRequestHeaders(['cookie']),
   }).then(response => {
     solicitudResponse.value = response
-    console.log(response)
+    if (solicitudResponse.value.resultadoCGO) {
+      archivos.value = solicitudResponse.value.resultadoCGO.archivosAdjuntos
+      resultado.value = {
+        cie: null,
+        diagnostico: null
+      }
+    }
     loading.value = false
   }).catch(error => {
     if (!error.data.data.errors && error.data.data.error) {
@@ -58,7 +64,7 @@ onMounted(() => {
   })
 })
 
-async function solicitarImagen(filename: string, descripcion: string) {
+function solicitarImagen(filename: string, descripcion: string) {
   $fetch<any>('/api/resultado/download/' + filename, {
     responseType: 'blob',
     headers: useRequestHeaders(['cookie']),
@@ -75,16 +81,39 @@ async function solicitarImagen(filename: string, descripcion: string) {
   })
 }
 
+function eliminarImagen(id: number) {
+  $fetch<any>('/api/resultado/delete/' + id, {
+    method: 'DELETE',
+    headers: useRequestHeaders(['cookie']),
+  }).then(response => {
+    if (archivos.value) {
+      let index = archivos.value.findIndex(e => e && e.id === id)
+      if (index !== -1) {
+        archivos.value[index] = response
+      }
+    }
+  }).catch(error => {
+    console.log(error)
+    if (!error.data.data.errors && error.data.data.error) {
+      sweetAlert.errorAlert(error.data.data.error)
+    }
+  })
+}
+
 function handleGuardar() {
-  $fetch('/api/resultado/' + id.value, {
+  $fetch<any>('/api/resultado/' + id.value, {
     method: 'POST',
     body: resultado.value,
     headers: useRequestHeaders(['cookie']),
-  }).then(() => {
+  }).then(response => {
+    solicitudResponse.value.resultadoCGO = response
+    archivos.value = response.archivosAdjuntos ?? []
+    resultado.value = {
+      cie: response.codigoEnfermedades.id,
+      diagnostico: response.observaciones
+    }
     sweetAlert.successAlert('Resultado registrado', 'El resultado ha sido registrado correctamente')
-    .then(() => {
-      router.push({ name: 'solicitud' })
-    })
+
   }).catch(error => {
     if (!error.data.data.errors && error.data.data.error) {
       sweetAlert.errorAlert(error.data.data.error)
@@ -106,14 +135,14 @@ function handleGuardar() {
 
         <h1 class="text-lg font-semibold">Información de solicitud</h1>
         <div class="grid grid-cols-2 gap-x-4 gap-y-3">
-            <div>
-                <label for="" class="">Número de factura</label>
-                <input :value="String(solicitudResponse?.id).padStart(5, '0')" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text">
-            </div>
-            <div>
-                <label for="" class="">Fecha de facturación</label>
-                <input :value="(new Date(solicitudResponse.createdAt)).toLocaleString('es-CA')" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text">
-            </div>
+          <div>
+              <label for="" class="">Número de solicitud</label>
+              <input :value="String(solicitudResponse?.id).padStart(5, '0')" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text">
+          </div>
+          <div>
+              <label for="" class="">Fecha de solicitud</label>
+              <input :value="(new Date(solicitudResponse.fechaSolicitud)).toLocaleString('es-CA')" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text">
+          </div>
         </div>
         <div>
             <div class="flex items-center space-x-1 mb-2">
@@ -271,7 +300,7 @@ function handleGuardar() {
               </div>
 
               <div class="col-span-1">
-                  <label for="" class="">Númeo de cortes</label>
+                  <label for="" class="">Número de cortes</label>
                   <input :value="solicitudResponse?.muestra?.numeroDeCortes" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
               </div>
 
@@ -287,49 +316,67 @@ function handleGuardar() {
             </div>
         </div>
 
-      <div class="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
-        <v-select class="col-span-2" v-model="resultado.cie" :items="codigoEnfermedades" label="CIE" variant="outlined" :error-messages="errors.cie" />
-        <v-textarea class="col-span-2" v-model="resultado.diagnostico" label="Diagnóstico" variant="outlined" :error-messages="errors.diagnostico" />
-
-        <div v-if="solicitudResponse && solicitudResponse.resultadoCGO" class="col-span-2">
-          <ArchivoModal v-model="archivos" :id="solicitudResponse.resultadoCGO.id" :open="modalArchivo" @toggle="modalArchivo = !modalArchivo"></ArchivoModal>
-          <ArchivoVer v-if="imageUrl" v-model="imageDescripcion" :open="modalImagen" :image-url="imageUrl" @toggle="modalImagen = !modalImagen"></ArchivoVer>
-          <button
-              class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2"
-              @click="modalArchivo = true"
-          >
-              Adjuntar imagen
-          </button>
-          <div class="rounded-lg border overflow-x-auto mt-5">
-              <table class="text-left w-full">
-                  <thead class="text-sm bg-gray-100">
-                      <tr>
-                          <th class="px-6 py-3">ID</th>
-                          <th class="px-6 py-3">Nombre de archivo</th>
-                          <th class="px-6 py-3">Descripción</th>
-                          <th class="px-6 py-3">Acciones</th>
-                      </tr>
-                  </thead>
-                  <tbody class="bg-white">
-                      <tr v-for="(item, index) in archivos" :key="index" class="border-b hover:bg-gray-50">
-                          <td class="border px-6 py-3">
-                              {{ item.id }}
-                          </td>
-                          <td class="border px-6 py-3">
-                              {{ item.ubicacion }}
-                          </td>
-                          <td class="border px-6 py-3">
-                              {{ item.descripcion }}
-                          </td>
-                          <td class="border pr-3 py-2">
-                              <button @click="solicitarImagen(item.ubicacion, item.descripcion)" class="font-semibold text-sm text-white bg-green-500 rounded-md hover:shadow-lg px-3 py-2">Ver</button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+              <h1 class="text-lg font-semibold">Resultado</h1>
           </div>
-      </div>
-      </div>
+
+          <div v-if="solicitudResponse && !solicitudResponse.resultadoCGO" class="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
+            <v-select class="col-span-2" v-model="resultado.cie" :items="codigoEnfermedades" label="CIE" variant="outlined" :error-messages="errors.cie" />
+            <v-textarea class="col-span-2" v-model="resultado.diagnostico" label="Diagnóstico" variant="outlined" :error-messages="errors.diagnostico" />
+          </div>
+          <div v-else class="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
+            <div class="col-span-2">
+              <label for="" class="">Código de enfermedad</label>
+              <input :value="solicitudResponse?.resultadoCGO?.codigoEnfermedades.descripcion" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+            </div>
+
+            <div class="col-span-2">
+              <label for="" class="">Diagnóstico</label>
+              <textarea :value="solicitudResponse?.resultadoCGO?.observaciones" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id=""></textarea>
+            </div>
+          </div>
+        </div>
+
+      <div v-if="solicitudResponse && solicitudResponse.resultadoCGO" class="col-span-2">
+        <ArchivoModal v-model="archivos" :id="solicitudResponse.resultadoCGO.id" :open="modalArchivo" @toggle="modalArchivo = !modalArchivo"></ArchivoModal>
+        <ArchivoVer v-if="imageUrl" v-model="imageDescripcion" :open="modalImagen" :image-url="imageUrl" @toggle="modalImagen = !modalImagen"></ArchivoVer>
+        <button
+            class="font-semibold text-sm text-white bg-blue-500 rounded-md hover:shadow-lg px-3 py-2"
+            @click="modalArchivo = true"
+        >
+            Adjuntar imagen
+        </button>
+        <div class="rounded-lg border overflow-x-auto mt-5">
+            <table class="text-left w-full">
+                <thead class="text-sm bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-3">ID</th>
+                        <th class="px-6 py-3">Nombre de archivo</th>
+                        <th class="px-6 py-3">Descripción</th>
+                        <th class="px-6 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    <tr v-for="(item, index) in archivos.filter((e) => e && e.deletedAt === null)" :key="index" class="border-b hover:bg-gray-50">
+                        <td class="border px-6 py-3">
+                            {{ item.id }}
+                        </td>
+                        <td class="border px-6 py-3">
+                            {{ item.ubicacion }}
+                        </td>
+                        <td class="border px-6 py-3">
+                            {{ item.descripcion }}
+                        </td>
+                        <td class="border pr-3 py-2">
+                            <button @click="solicitarImagen(item.ubicacion, item.descripcion)" class="font-semibold text-sm text-white bg-lime-500 rounded-md hover:shadow-lg px-3 py-2">Ver</button>
+                            <button @click="eliminarImagen(item.id)" class="font-semibold text-sm text-white bg-red-500 rounded-md hover:shadow-lg px-3 py-2">X</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
       <div class="text-sm">Los campos marcados con (<span class="text-red-500">*</span>) son requeridos</div>
       <div class="flex justify-end mt-5">
