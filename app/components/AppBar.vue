@@ -33,7 +33,7 @@ function isAuthorized(userRole: string, roles: unknown[]): boolean {
           <ul class="space-y-1">
             <li>
               <NuxtLink
-                to="/home"
+                to="/"
                 class="flex items-center border-2 border-transparent text-base text-black font-semibold hover:bg-blue-100 rounded-lg px-4 py-3"
                 active-class="bg-blue-100 !border-stone-200"
               >

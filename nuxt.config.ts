@@ -10,6 +10,7 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     apiBase: '',
+    graphqlBase: '',
     oauth: {
       keycloak: {
         serverUrl: '',

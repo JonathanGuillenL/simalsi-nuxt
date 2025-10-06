@@ -244,7 +244,11 @@ async function handlePdfClick(id: number) {
     <span>Pagos</span>
   </div>
   <div v-if="facturaResponse" class="bg-white rounded border shadow-lg p-6 m-6">
-    <PagoModal :factura-id="id" :open="modalPago" v-model="facturaResponse" @toggle="modalPago = !modalPago" />
+    <AuthState>
+      <template #default="{ user }">
+        <PagoModal v-if="!user?.roles.includes(SimalsiRoles.ROLE_CLIENTE)" :factura-id="id" :open="modalPago" v-model="facturaResponse" @toggle="modalPago = !modalPago" />
+      </template>
+    </AuthState>
     <div class="flex justify-between items-center">
       <button
         v-if="facturaResponse.saldoPendiente > 0"

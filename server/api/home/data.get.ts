@@ -1,9 +1,11 @@
 export default defineEventHandler(async (event) => {
   const { secure } = await requireUserSession(event)
+  const runtimeConfig = useRuntimeConfig()
+  const graphqlBase = runtimeConfig.graphqlBase
 
   const response = await $fetch<{
       data: HomeData
-    }>('http://localhost:8080/graphql', {
+    }>(`${graphqlBase}/graphql`, {
     method: 'POST',
     body: {
       query: `

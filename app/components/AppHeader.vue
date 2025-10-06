@@ -35,7 +35,6 @@ const float = ref(false)
       </AuthState>
       <div v-show="float" class="fixed inset-0 bg-transparent" @click="float = false">
         <div class="absolute right-2 top-[68px] bg-white rounded-lg border shadow-2xl space-y-2 w-32 p-2">
-          <a href="" class="block text-sm">Perfil</a>
           <a href="/api/auth/logout" class="block text-sm">Cerrar sesión</a>
         </div>
       </div>

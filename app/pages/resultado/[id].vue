@@ -36,7 +36,7 @@ onMounted(() => {
     headers: useRequestHeaders(['cookie']),
   }).then(response => {
     codigoEnfermedades.value = response.map(item => ({
-      title: item.descripcion,
+      title: item.codigo + ' - ' + item.descripcion,
       value: item.id
     }))
   }).catch(error => {
@@ -322,13 +322,13 @@ function handleGuardar() {
           </div>
 
           <div v-if="solicitudResponse && !solicitudResponse.resultadoCGO" class="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
-            <v-select class="col-span-2" v-model="resultado.cie" :items="codigoEnfermedades" label="CIE" variant="outlined" :error-messages="errors.cie" />
+            <v-autocomplete class="col-span-2" v-model="resultado.cie" :items="codigoEnfermedades" label="CIE" variant="outlined" :error-messages="errors.cie" clearable />
             <v-textarea class="col-span-2" v-model="resultado.diagnostico" label="Diagnóstico" variant="outlined" :error-messages="errors.diagnostico" />
           </div>
           <div v-else class="grid grid-cols-2 gap-x-4 gap-y-3 mt-4">
             <div class="col-span-2">
               <label for="" class="">Código de enfermedad</label>
-              <input :value="solicitudResponse?.resultadoCGO?.codigoEnfermedades.descripcion" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
+              <input :value="solicitudResponse?.resultadoCGO?.codigoEnfermedades?.descripcion" :readonly="true" class="block bg-slate-100 rounded-lg w-full px-3 py-2" type="text" name="" id="">
             </div>
 
             <div class="col-span-2">
